@@ -1,0 +1,34 @@
+{
+  "branchId": 362,
+  "deliveryType": "Courier - 180 min",
+  "fullOrderNumber": "362-1334430-1-OR",
+  "carrier": "PACE",
+  "caller": "PlaceMakers",
+  "parcel_Pickup_Date_Time": "2018-11-23T10:00:00",
+  "parcel_quantity": 1,
+  "parcel_pickup_address": {
+    "phone": "021 123 456"
+  },
+  "parcel_delivery_address": {
+    "phone": "021 456 789",
+    "street": "42C Tawa Drive",
+    "suburb": "Albany",
+    "city": "Auckland",
+    "postcode": "0632"
+  },
+  "label_sender_details": {
+    "name": "PlaceMakers Thames",
+    "phone": "07-868 0130"
+  },
+  "label_receiver_details": {
+    "name": "AA Homes",
+    "phone": "09-414 1460"
+  },
+  "label_delivery_address": {
+    "phone": "021 456 789",
+    "street": "42C Tawa Drive",
+    "suburb": "Albany",
+    "city": "Auckland",
+    "postcode": "0632"
+  }
+}
