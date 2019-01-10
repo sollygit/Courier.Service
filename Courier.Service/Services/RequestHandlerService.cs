@@ -102,7 +102,7 @@ namespace Courier.Service.Services
 
                 var parcelLabelRequest = new ParcelLabelRequest
                 {
-                    Carrier = request.Carrier,
+                    Carrier = request.Carrier.ToUpper(),
                     Logo_Id = courierDetails.LogoId,
                     Job_Number = Convert.ToInt32(jobNumber),
                     Sender_Details = request.Label_Sender_Details,
@@ -144,9 +144,8 @@ namespace Courier.Service.Services
 
             catch (Exception ex)
             {
-                // Update ACE of any other errors thrown by the service
-                consignment.Details = ex.Message;
-                await aceService.UpdateParcelLabel(request.BranchId.ToString(), request.FullOrderNumber, consignment, courierDetails.Username);
+                // Log any other errors thrown by the service
+                logger.LogError($"Something went wrong: {ex.Message}");
             }
         }
     }

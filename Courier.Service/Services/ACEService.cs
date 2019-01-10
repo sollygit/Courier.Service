@@ -65,7 +65,7 @@ namespace Courier.Service.Services
 
                 else
                 {
-                    logger.LogDebug($"OrderNumber:{request.OrderNumber} Error:{request.Message}");
+                    logger.LogDebug($"OrderNumber:{request.OrderNumber} Message:{request.Message}");
                 }
 
                 return contract.OrderNumber;

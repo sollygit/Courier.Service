@@ -57,7 +57,15 @@ namespace Courier.Service.Services
                 if (!response.IsSuccessStatusCode || string.IsNullOrEmpty(contract.Results.JobNumber))
                 {
                     logger.LogError($"Unsuccessful Parcel Pickup response: {response.StatusCode}");
-                    throw new ServiceException(response.StatusCode, $"Parcel Pickup Error - {contract.Errors[0].Details}");
+
+                    if (contract.Errors != null && contract.Errors.Count != 0)
+                    {
+                        throw new ServiceException(response.StatusCode, $"Parcel Pickup Error - {contract.Errors[0].Details}");
+                    }
+                    else
+                    {
+                        throw new ServiceException(response.StatusCode, $"Parcel Pickup Status Code: {response.StatusCode}");
+                    }
                 }
 
                 logger.LogDebug($"Parcel Pickup Job_Number:{contract.Results.JobNumber}");
