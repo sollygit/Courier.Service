@@ -15,7 +15,7 @@ namespace Courier.Service.Services
     {
         private IDisposable unsubscriber;
         private readonly ILogger<RequestHandlerService> logger;
-        private readonly IEventBus<CourierRequest> bus;
+        private readonly ICourierService<CourierRequest> courierService;
         private readonly ICourierDetailsService courierDetailsService;
         private readonly IParcelPickupService parcelService;
         private readonly IParcelLabelService labelService;
@@ -24,7 +24,7 @@ namespace Courier.Service.Services
 
         public RequestHandlerService(
             ILogger<RequestHandlerService> logger,
-            IEventBus<CourierRequest> bus,
+            ICourierService<CourierRequest> courierService,
             ICourierDetailsService courierDetailsService,
             IParcelPickupService parcelService,
             IParcelLabelService labelService,
@@ -32,12 +32,24 @@ namespace Courier.Service.Services
             INotificationService notificationService)
         {
             this.logger = logger;
-            this.bus = bus;
+            this.courierService = courierService;
             this.courierDetailsService = courierDetailsService;
             this.parcelService = parcelService;
             this.labelService = labelService;
             this.aceService = aceService;
             this.notificationService = notificationService;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            unsubscriber = courierService.Subscribe(this);
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            unsubscriber.Dispose();
+            return Task.CompletedTask;
         }
 
         public virtual void OnNext(CourierRequest request)
@@ -51,28 +63,6 @@ namespace Courier.Service.Services
 
         public virtual void OnError(Exception error)
         {
-        }
-
-        public virtual void Subscribe(IObservable<CourierRequest> provider)
-        {
-            unsubscriber = bus.Subscribe(this);
-        }
-
-        public virtual void Unsubscribe()
-        {
-            unsubscriber.Dispose();
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            Subscribe(bus);
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            Unsubscribe();
-            return Task.CompletedTask;
         }
 
         public async Task Process(CourierRequest request)

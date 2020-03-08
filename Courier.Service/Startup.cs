@@ -32,16 +32,16 @@ namespace Courier.Service
             services.AddSingleton(provider => Configuration.GetSection("Auth0").Get<AuthZeroSettings>());
             services.AddSingleton(provider => Configuration.GetSection("CourierSettings").Get<CourierSettings>());
             services.AddSingleton(provider => Configuration.GetSection("SendGridSettings").Get<SendGridSettings>());
-            services.AddSingleton<IAuthService, AuthZeroService>();
+            services.AddTransient<IAuthService, AuthZeroService>();
             
             // Register Hosted Services
             services.AddSingleton<IHostedService, RequestHandlerService>();
-            services.AddSingleton<IEventBus<CourierRequest>, EventBusService>();
-            services.AddSingleton<ICourierDetailsService, CourierDetailsService>();
-            services.AddSingleton<IParcelPickupService, ParcelPickupService>();
-            services.AddSingleton<IParcelLabelService, ParcelLabelService>();
-            services.AddSingleton<IACEService, ACEService>();
-            services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<ICourierService<CourierRequest>, CourierService>();
+            services.AddTransient<ICourierDetailsService, CourierDetailsService>();
+            services.AddTransient<IParcelPickupService, ParcelPickupService>();
+            services.AddTransient<IParcelLabelService, ParcelLabelService>();
+            services.AddTransient<IACEService, ACEService>();
+            services.AddTransient<INotificationService, NotificationService>();
 
             services
                 .AddMvcCore()

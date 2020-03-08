@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 
 namespace Courier.Service.Controllers
 {
-    [Route("api/100/[controller]")]
+    [Route("api/[controller]")]
     public class CourierController : ControllerBase
     {
-        private readonly IEventBus<CourierRequest> bus;
+        private readonly ICourierService<CourierRequest> service;
 
-        public CourierController(IEventBus<CourierRequest> bus)
+        public CourierController(ICourierService<CourierRequest> service)
         {
-            this.bus = bus;
+            this.service = service;
         }
 
         [HttpPost("Pickup")]
@@ -21,7 +21,7 @@ namespace Courier.Service.Controllers
             if (request == null || !ModelState.IsValid)
                 return BadRequest("Courier Pickup request could not be parsed");
 
-            await bus.Process(request);
+            await service.Process(request);
 
             return Ok();
         }

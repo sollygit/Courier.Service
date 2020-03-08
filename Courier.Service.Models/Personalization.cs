@@ -1,7 +1,7 @@
 ﻿using Courier.Service.Models.Notification;
 using Newtonsoft.Json;
 
-namespace Courier.Service
+namespace Courier.Service.Models
 {
     public class Personalization : SendGrid.Helpers.Mail.Personalization
     {

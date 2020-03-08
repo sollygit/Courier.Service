@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Courier.Service.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class LabelController : ControllerBase
     {
         private readonly IParcelLabelService labelService;

@@ -1,5 +1,4 @@
-﻿using Courier.Service.Api;
-using Courier.Service.Interfaces;
+﻿using Courier.Service.Interfaces;
 using Courier.Service.Models;
 using Courier.Service.Models.ParcelLabel;
 using Courier.Service.Settings;
@@ -18,7 +17,7 @@ namespace Courier.Service.Services
         readonly ILogger<ACEService> logger;
         readonly CourierSettings courierSettings;
 
-        public ACEService(ILogger<ACEService> logger, IAuthService authService, CourierSettings courierSettings, AuthZeroSettings auth0Settings)
+        public ACEService(ILogger<ACEService> logger, CourierSettings courierSettings, AuthZeroSettings auth0Settings)
         {
             this.logger = logger;
             this.courierSettings = courierSettings;
