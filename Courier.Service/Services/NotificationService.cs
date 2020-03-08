@@ -14,15 +14,21 @@ namespace Courier.Service.Services
 {
     public class NotificationService : INotificationService
     {
-        readonly ILogger<NotificationService> logger;
-        readonly SendGridSettings sendGridSettings;
-        readonly CourierSettings courierSettings;
+        private readonly ILogger<NotificationService> logger;
+        private readonly SendGridSettings sendGridSettings;
+        private readonly CourierSettings courierSettings;
+        private readonly HttpClient httpClient;
 
-        public NotificationService(ILogger<NotificationService> logger, SendGridSettings sendGridSettings, CourierSettings courierSettings)
+        public NotificationService(
+            ILogger<NotificationService> logger, 
+            SendGridSettings sendGridSettings, 
+            CourierSettings courierSettings,
+            HttpClient httpClient)
         {
             this.logger = logger;
             this.sendGridSettings = sendGridSettings;
             this.courierSettings = courierSettings;
+            this.httpClient = httpClient;
         }
 
         public async Task<string> Send(NotificationRequest request, string username, string consignmentId)
@@ -31,35 +37,29 @@ namespace Courier.Service.Services
             request.NotificationMethod = sendGridSettings.NotificationMethod;
             request.OrderLocation = string.Format(courierSettings.EmailLabelDownloadUrl, consignmentId, username);
 
-            using (var client = new HttpClient())
+            var uriBuilder = new UriBuilder(string.Format(courierSettings.NotificationUrl, request.BranchId));
+            var jsonRequest = JsonConvert.SerializeObject(request, Formatting.None);
+            var jsonContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(uriBuilder.Uri, jsonContent);
+            var result = response.Content.ReadAsStringAsync().Result;
+            var contract = JsonConvert.DeserializeObject<NotificationResponseContract>(result);
+
+            if (!response.IsSuccessStatusCode)
             {
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", courierSettings.SubscriptionKey);
+                logger.LogError($"Send Notification StatusCode: {response.StatusCode}");
+                throw new ServiceException(response.StatusCode, "Send Notification Error");
+            }
 
-                var uriBuilder = new UriBuilder(string.Format(courierSettings.NotificationUrl, request.BranchId));
-                var jsonRequest = JsonConvert.SerializeObject(request, Formatting.None);
-                var jsonContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(uriBuilder.Uri, jsonContent);
-                var result = response.Content.ReadAsStringAsync().Result;
-                var contract = JsonConvert.DeserializeObject<NotificationResponseContract>(result);
+            if (contract.ServiceResult.Code != 0)
+            {
+                logger.LogError($"Send Notification: {contract.ServiceResult.Message}");
+                throw new ServiceException($"Send Notification: {contract.ServiceResult.Message}");
+            }
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    logger.LogError($"Send Notification StatusCode: {response.StatusCode}");
-                    throw new ServiceException(response.StatusCode, "Send Notification Error");
-                }
+            logger.LogDebug($"Label Notification for OrderNo {contract.OrderNo} was sent to {request.CustomerEmail}");
+            logger.LogDebug($"Label Download URL:{request.OrderLocation}");
 
-                if (contract.ServiceResult.Code != 0)
-                {
-                    logger.LogError($"Send Notification: {contract.ServiceResult.Message}");
-                    throw new ServiceException($"Send Notification: {contract.ServiceResult.Message}");
-                }
-
-                logger.LogDebug($"Label Notification for OrderNo {contract.OrderNo} was sent to {request.CustomerEmail}");
-                logger.LogDebug($"Label Download URL:{request.OrderLocation}");
-
-                return contract.OrderNo;
-            }           
+            return contract.OrderNo;
         }
     }
 }
