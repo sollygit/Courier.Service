@@ -36,7 +36,7 @@ namespace Courier.Service
             services.AddSingleton(provider => authSettings);
             services.AddSingleton(provider => courierSettings);
             services.AddSingleton(provider => sendGridSettings);
-            services.AddSingleton<IHostedService, CourierHandlerService>();
+            services.AddSingleton<IHostedService, CourierRequestHandlerService>();
             services.AddSingleton<IEventBusService<CourierRequest>, EventBusService>();
 
             services.AddHttpClient<ICourierDetailsService, CourierDetailsService>(client =>

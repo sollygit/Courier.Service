@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 
 namespace Courier.Service.Services
 {
-    public class CourierHandlerService : IHostedService, IObserver<CourierRequest>
+    public class CourierRequestHandlerService : IHostedService, IObserver<CourierRequest>
     {
         private IDisposable unsubscriber;
-        private readonly ILogger<CourierHandlerService> logger;
-        private readonly IEventBusService<CourierRequest> courierService;
+        private readonly ILogger<CourierRequestHandlerService> logger;
+        private readonly IEventBusService<CourierRequest> eventBus;
         private readonly ICourierDetailsService courierDetailsService;
         private readonly IParcelPickupService parcelService;
         private readonly IParcelLabelService labelService;
         private readonly IACEService aceService;
         private readonly INotificationService notificationService;
 
-        public CourierHandlerService(
-            ILogger<CourierHandlerService> logger,
-            IEventBusService<CourierRequest> courierService,
+        public CourierRequestHandlerService(
+            ILogger<CourierRequestHandlerService> logger,
+            IEventBusService<CourierRequest> eventBus,
             ICourierDetailsService courierDetailsService,
             IParcelPickupService parcelService,
             IParcelLabelService labelService,
@@ -32,7 +32,7 @@ namespace Courier.Service.Services
             INotificationService notificationService)
         {
             this.logger = logger;
-            this.courierService = courierService;
+            this.eventBus = eventBus;
             this.courierDetailsService = courierDetailsService;
             this.parcelService = parcelService;
             this.labelService = labelService;
@@ -42,7 +42,7 @@ namespace Courier.Service.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            unsubscriber = courierService.Subscribe(this);
+            unsubscriber = eventBus.Subscribe(this);
             return Task.CompletedTask;
         }
 
