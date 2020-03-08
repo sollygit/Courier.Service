@@ -8,9 +8,9 @@ namespace Courier.Service.Controllers
     [Route("api/[controller]")]
     public class CourierController : ControllerBase
     {
-        private readonly ICourierService<CourierRequest> service;
+        private readonly IEventBusService<CourierRequest> service;
 
-        public CourierController(ICourierService<CourierRequest> service)
+        public CourierController(IEventBusService<CourierRequest> service)
         {
             this.service = service;
         }

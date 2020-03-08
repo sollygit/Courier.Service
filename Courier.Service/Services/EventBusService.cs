@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Courier.Service.Services
 {
-    public class CourierService : ICourierService<CourierRequest>
+    public class EventBusService : IEventBusService<CourierRequest>
     {
         readonly List<IObserver<CourierRequest>> subjects;
 
-        public CourierService()
+        public EventBusService()
         {
             subjects = new List<IObserver<CourierRequest>>();
         }
@@ -21,7 +21,6 @@ namespace Courier.Service.Services
             {
                 subjects.Add(subject);
             }
-
             return new Unsubscriber(subjects, subject);
         }
 
@@ -35,11 +34,23 @@ namespace Courier.Service.Services
             return Task.CompletedTask;
         }
 
-        public void OnError(Exception ex)
+        private class Unsubscriber : IDisposable
         {
-            foreach (var subject in subjects)
+            private readonly List<IObserver<CourierRequest>> _subjects;
+            private readonly IObserver<CourierRequest> _subject;
+
+            public Unsubscriber(List<IObserver<CourierRequest>> subjects, IObserver<CourierRequest> subject)
             {
-                subject.OnError(ex);
+                _subjects = subjects;
+                _subject = subject;
+            }
+
+            public void Dispose()
+            {
+                if (_subject != null)
+                {
+                    _subjects.Remove(_subject);
+                }
             }
         }
     }
