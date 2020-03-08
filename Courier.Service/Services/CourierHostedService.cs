@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Courier.Service.Services
 {
-    public class CourierRequestHandlerService : IHostedService, IObserver<CourierRequest>
+    public class CourierHostedService : IHostedService, IObserver<CourierRequest>
     {
         private IDisposable unsubscriber;
-        private readonly ILogger<CourierRequestHandlerService> logger;
+        private readonly ILogger<CourierHostedService> logger;
         private readonly IEventBusService<CourierRequest> eventBus;
         private readonly ICourierDetailsService courierDetailsService;
         private readonly IParcelPickupService parcelService;
@@ -22,8 +22,8 @@ namespace Courier.Service.Services
         private readonly IACEService aceService;
         private readonly INotificationService notificationService;
 
-        public CourierRequestHandlerService(
-            ILogger<CourierRequestHandlerService> logger,
+        public CourierHostedService(
+            ILogger<CourierHostedService> logger,
             IEventBusService<CourierRequest> eventBus,
             ICourierDetailsService courierDetailsService,
             IParcelPickupService parcelService,
